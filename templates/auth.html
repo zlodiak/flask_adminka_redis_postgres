@@ -1,0 +1,62 @@
+<!doctype html>
+
+<title>Auth</title>
+
+<div class="auth-form">
+	<input type="text" name="email" placeholder="email" id="email">
+	<input type="password" name="password" placeholder="password" id="password">
+	<button id="submitBtn">Send</button>
+	<div class="error" id="errorMsg">Authorization is failed</div>
+</div>
+
+<a href="/registration">to registration</a>
+
+<style type="text/css">
+	body {
+		background: yellow;
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;	
+		flex-direction: column;	
+	}
+
+		.auth-form {
+			width: 200px;
+			background: lime;
+			padding: 20px;
+		}
+
+			input {
+				margin-bottom: 10px;
+			}
+</style>
+
+<script type="text/javascript">
+	const submitBtnElem = document.getElementById('submitBtn');
+	const errorMsgElem = document.getElementById('errorMsg');
+	errorMsgElem.style.display = 'none';
+
+	if(submitBtnElem) {
+		submitBtnElem.addEventListener('click', auth);
+	}
+
+	function auth() {
+		const email = document.getElementById('email').value;
+		const password = document.getElementById('password').value;		
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "auth_request", true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = function() {
+		  if(xhr.status === 200 && this.responseText === 'authorized') {
+		  	document.location.pathname = '/admin'
+		  } else {
+		  	console.log('Authorization is failed.');
+		  	errorMsgElem.style.display = 'block';
+		  }
+		}
+		xhr.send(`email=${email}&password=${password}`);
+	}
+</script>

@@ -1,0 +1,248 @@
+<!doctype html>
+
+<title>Admin</title>
+
+<div class="wrap">
+	<div class="tabs">
+		<span class="tab tab1" id="tab1">profile</span>	
+		<span class="tab tab2" id="tab2">theme</span>	
+		<span class="tab tab3" id="tab3">notepad</span>	
+	</div>
+
+	<div class="bodies">
+		<div class="body body1" id="body1">
+			<div class="profile" method="POST">
+				<input type="text" name="firstname" placeholder="firstname" id="firstname" value="{{ admin_forms_values['firstname'] }}">
+				<input type="text" name="lastname" placeholder="lastname" id="lastname" value="{{ admin_forms_values['lastname'] }}">
+				<button type="submit" class="submit" id="profileSubmitBtn">Send</button>
+			</div>
+			<div class="msg error" id="errorProfileMsg">Operation is failed</div>
+			<div class="msg success" id="successProfileMsg">Operation is successfully</div>
+			<div class="msg validation" id="validationProfileMsg">Fill all fields</div>
+		</div>
+
+		<div class="body body2" id="body2">
+            under construction
+		</div>
+
+		<div class="body body3" id="body3">
+			<div class="notepad" method="POST">
+				<textarea class="notepad" id="notepad">{{ admin_forms_values['notepad'] }}</textarea>
+                <button type="submit" class="submit" id="notepadSubmitBtn">Send</button>
+			</div>
+            <div class="msg error" id="errorNotepadeMsg">Operation is failed</div>
+            <div class="msg success" id="successNotepadMsg">Operation is successfully</div>
+            <div class="msg validation" id="validationNotepadMsg">Fill textarea</div>
+		</div>
+	</div>
+
+	<div class="user-info">
+		<div class="current-user"></div>
+		<div class="logout-btn" id="logoutBtn">Logout</div>
+	</div>
+</div>
+
+<style type="text/css">
+	.wrap {
+		position: relative;
+	}
+
+		.user-info {
+			position: absolute;
+			top: 0;
+			right: 0;
+			background: lime;
+			padding: 10px;
+		}
+
+			.logout-btn {
+				padding: 10px;
+				background: magenta;
+			}
+
+		.tab {
+			margin: 20px;
+			padding: 10px;
+			background: yellow;
+		}
+
+			.tab.active {
+				background: red;
+			}
+
+		.body {
+			margin: 20px;
+			padding: 10px;
+			background: cyan;
+			min-height: 200px;
+		}
+</style>
+
+<script type="text/javascript">
+	const logoutBtnElem = document.getElementById('logoutBtn');
+
+	logoutBtnElem.addEventListener('click', () => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "logout_request", true);
+		xhr.onreadystatechange = function() {
+		  if(xhr.status === 200 && this.responseText === 'logout is complete') {
+		  	document.location.href = 'http://127.0.0.1:5000/';
+		  }
+		}
+		xhr.send();		
+	});	
+</script>
+
+<script type="text/javascript">
+	const tab1Elem = document.getElementById('tab1');
+	const tab2Elem = document.getElementById('tab2');
+	const tab3Elem = document.getElementById('tab3');
+
+	const body1Elem = document.getElementById('body1');
+	const body2Elem = document.getElementById('body2');
+	const body3Elem = document.getElementById('body3');
+
+	hideAllBodies();
+	showBody(body1Elem);
+	unactiveAllTabs();
+	activeTab(tab1Elem);
+
+	tab1Elem.addEventListener('click', () => {
+		hideAllBodies();
+		showBody(body1Elem);
+		unactiveAllTabs();
+		activeTab(tab1Elem);
+	});
+
+	tab2Elem.addEventListener('click', () => {
+		hideAllBodies();
+		showBody(body2Elem);
+		unactiveAllTabs();
+		activeTab(tab2Elem);
+	});
+
+	tab3Elem.addEventListener('click', () => {
+		hideAllBodies();
+		showBody(body3Elem);
+		unactiveAllTabs();
+		activeTab(tab3Elem);
+	});
+
+	function hideAllBodies() {
+		[body1Elem, body2Elem, body3Elem].forEach((elem) => {
+			elem.style.display = 'none';
+		});
+	}
+
+	function showBody(bodyElem) {
+		bodyElem.style.display = 'block';
+	}
+
+	function unactiveAllTabs() {
+		[tab1Elem, tab2Elem, tab3Elem].forEach((elem) => {
+			elem.classList.remove("active");
+		});
+	}
+
+	function activeTab(tabElem) {
+		tabElem.classList.add("active");
+	}
+</script>
+
+<script type="text/javascript">
+	const profileSubmitBtnElem = document.getElementById('profileSubmitBtn');
+	const errorProfileMsgElem = document.getElementById('errorProfileMsg');
+	const successProfileMsgElem = document.getElementById('successProfileMsg');
+	const validationProfileMsgElem = document.getElementById('validationProfileMsg');
+
+	setProfileMsgVisibility('none', 'none', 'none');
+
+	if(profileSubmitBtnElem) {
+		profileSubmitBtnElem.addEventListener('click', profileSubmit);
+	}
+
+	function profileSubmit() {
+		const firstname = document.getElementById('firstname').value;
+		const lastname = document.getElementById('lastname').value;
+
+
+		if (!firstname || !lastname) {
+			setProfileMsgVisibility('none', 'none', 'block');
+			setTimeout(() => {
+				setProfileMsgVisibility('none', 'none', 'none');
+			}, 2000);
+			return;
+		}
+
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "submit_profile_request", true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = function() {
+		  if(xhr.status === 200 && this.responseText === 'submit profile is complete') {
+		  	setProfileMsgVisibility('block', 'none');
+		  } else {
+		  	setProfileMsgVisibility('none', 'block');
+		  }
+
+		  setTimeout(() => {
+		  	setProfileMsgVisibility('none', 'none');
+		  }, 2000);
+		}
+		xhr.send(`firstname=${firstname}&lastname=${lastname}`);
+	}
+
+	function setProfileMsgVisibility(success, error, validation) {
+	  	successProfileMsgElem.style.display = success;
+	  	errorProfileMsgElem.style.display = error;
+	  	validationProfileMsgElem.style.display = validation;
+	}
+</script>
+
+<script type="text/javascript">
+    const notepadSubmitBtnElem = document.getElementById('notepadSubmitBtn');
+    const errorNotepadMsgElem = document.getElementById('errorNotepadeMsg');
+    const successNotepadMsgElem = document.getElementById('successNotepadMsg');
+    const validationNotepadMsgElem = document.getElementById('validationNotepadMsg');
+
+    setNotepadMsgVisibility('none', 'none', 'none');
+
+    if(notepadSubmitBtnElem) {
+        notepadSubmitBtnElem.addEventListener('click', notepadSubmit);
+    }
+
+    function notepadSubmit() {
+        const notepad = document.getElementById('notepad').value;
+        console.log(notepad)
+
+
+        if (!notepad) {
+            setNotepadMsgVisibility('none', 'none', 'block');
+            setTimeout(() => {
+                setNotepadMsgVisibility('none', 'none', 'none');
+            }, 2000);
+            return;
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "submit_notepad_request", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+          if(xhr.status === 200 && this.responseText === 'submit notepad is complete') {
+            setNotepadMsgVisibility('block', 'none');
+          } else {
+            setNotepadMsgVisibility('none', 'block');
+          }
+
+          setTimeout(() => {
+            setNotepadMsgVisibility('none', 'none');
+          }, 2000);
+        }
+        xhr.send(`notepad=${notepad}`);
+    }
+
+    function setNotepadMsgVisibility(success, error, validation) {
+        successNotepadMsgElem.style.display = success;
+        errorNotepadMsgElem.style.display = error;
+        validationNotepadMsgElem.style.display = validation;
+    }
+</script>

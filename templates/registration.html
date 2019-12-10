@@ -1,0 +1,62 @@
+<!doctype html>
+
+<title>Registration</title>
+
+<div class="registration-form">
+	<input type="text" name="email" placeholder="email" id="email">
+	<input type="password" name="password" placeholder="password" id="password">
+	<button id="submitBtn">Send</button>
+	<div class="error" id="errorMsg">Registration is failed</div>
+</div>
+
+<a href="/">to authentication</a>
+
+<style type="text/css">
+	body {
+		background: red;
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;	
+		flex-direction: column;		
+	}
+
+		.registration-form {
+			width: 200px;
+			background: lime;
+			padding: 20px;
+		}
+
+			input {
+				margin-bottom: 10px;
+			}
+</style>
+
+<script type="text/javascript">
+	const submitBtnElem = document.getElementById('submitBtn');
+	const errorMsgElem = document.getElementById('errorMsg');
+	errorMsgElem.style.display = 'none';
+
+	if(submitBtnElem) {
+		submitBtnElem.addEventListener('click', registration);
+	}
+
+	function registration() {
+		const email = document.getElementById('email').value;
+		const password = document.getElementById('password').value;		
+		const xhr = new XMLHttpRequest();
+		xhr.open("POST", "registration_request", true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onreadystatechange = function() {
+		  if(xhr.status === 200 && this.responseText === 'registered') {
+		  	document.location.pathname = '/'
+		  } else {
+		  	console.log('Registration is failed.');
+		  	errorMsgElem.style.display = 'block';
+		  }
+		}
+		xhr.send(`email=${email}&password=${password}`);
+	}
+</script>
